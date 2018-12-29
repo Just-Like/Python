@@ -6,7 +6,7 @@
 @Date : 2018/8/29
 '''
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from orm.lottery import Base
 from sqlalchemy import create_engine,event
 from sqlalchemy.exc import DisconnectionError
 from config import CurrentConfig as Config
@@ -17,15 +17,15 @@ engine = create_engine(Config.DB_CONNECT_STRING.format( user=Config.mysql_user,
 														database=Config.mysql_database,
 														charset=Config.mysql_charset ), echo=Config.mysql_echo,pool_size=100)
 DB_Session = sessionmaker(bind=engine)
-BaseModel = declarative_base()
+
 
 
 def init_db():
-	BaseModel.metadata.create_all(engine)
+	Base.metadata.create_all(engine)
 
 
 def drop_db():
-	BaseModel.metadata.drop_all(engine)
+	Base.metadata.drop_all(engine)
 
 def checkout_listener(dbapi_con, con_record, con_proxy):
 	try:
@@ -39,3 +39,8 @@ def checkout_listener(dbapi_con, con_record, con_proxy):
 		else:
 			raise
 event.listen(engine, 'checkout', checkout_listener)
+
+
+if __name__ == '__main__':
+	drop_db()
+	init_db()

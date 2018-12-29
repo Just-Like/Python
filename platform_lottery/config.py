@@ -44,20 +44,18 @@ class Config(object):
 			   {"http": "http://192.19.97.185:9090"},
 			   ]
 	lottery_table_name='hey_lottery'
-	DB_CONNECT_STRING = 'mysql+mysqldb://{user}:{password}@{hostname}/{database}?charset={charset}'
+	DB_CONNECT_STRING = 'mysql+pymysql://{user}:{password}@{hostname}/{database}?charset={charset}'
 
 
 class LocalConfig(Config):
 	local_host = ""
 	mysql_user = 'root'
-	mysql_password = '123456'
+	mysql_password = 'root'
 	mysql_hostname = '127.0.0.1:3306'
 	mysql_database = 'heyshow_new'
 	mysql_charset = 'utf8'
 	mysql_echo = False
-	redis_host = '127.0.0.1'
-	redis_port = 6379
-	redis_password = None
+
 
 
 class TestConfig(Config):
@@ -80,4 +78,4 @@ config = {
 	'test_config': TestConfig
 }
 
-CurrentConfig = config['online']
+CurrentConfig = config['offline']
