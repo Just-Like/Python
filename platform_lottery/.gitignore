@@ -1,0 +1,8 @@
+build/*
+dist/*
+danmu.egg-info/*
+*.pyc
+*.swp
+*.log
+*.bak
+/.idea
