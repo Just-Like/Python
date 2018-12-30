@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import os
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
+
+
 class Config(object):
 	"""配置文件"""
 

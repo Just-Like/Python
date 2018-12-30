@@ -6,10 +6,9 @@
 @Date : 2018/8/29
 '''
 from sqlalchemy import Column, Integer, BigInteger, VARCHAR, TIMESTAMP, func
-from sqlalchemy.ext.declarative import declarative_base
+from config import Base
 from config import CurrentConfig as Config
 
-Base = declarative_base()
 
 
 class Lottery(Base):

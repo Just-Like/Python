@@ -6,7 +6,8 @@
 @Date : 2018/8/29
 '''
 from sqlalchemy.orm import sessionmaker
-from orm.lottery import Base
+from config import Base
+from orm import lottery
 from sqlalchemy import create_engine,event
 from sqlalchemy.exc import DisconnectionError
 from config import CurrentConfig as Config
