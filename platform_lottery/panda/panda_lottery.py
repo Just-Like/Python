@@ -20,15 +20,15 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 class PandaLottery(BaseLottery):
 	def __init__(self):
 		BaseLottery.__init__(self,Config,LOG)
 		self.start_time=time.time()
 
-
 	def scraping(self,url,try_num=3,ext_param=object):
 		res = None
-		User_Agent = [
+		user_agent = [
 			'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_8; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50',
 			'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-us) AppleWebKit/534.50 (KHTML, like Gecko) Version/5.1 Safari/534.50',
 			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:2.0.1) Gecko/20100101 Firefox/4.0.1',
@@ -38,39 +38,38 @@ class PandaLottery(BaseLottery):
 			'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13pre',
 			'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11'
 		]
-		headers = {"User-Agent": random.choice(User_Agent),
-		           'Referer':'https://www.panda.tv/all'
+		headers = {"User-Agent": random.choice(user_agent),
+		           'Referer': 'https://www.panda.tv/all'
 		           }
 		try:
-			res = requests.get(url,headers=headers,proxies=random.choice(Config.proxies))
-			if res.status_code != 200 and try_num>0:
-				self.scraping(url,try_num=try_num-1)
+			res = requests.get(url, headers=headers, proxies=random.choice(Config.proxies))
+			if res.status_code != 200 and try_num > 0:
+				self.scraping(url, try_num=try_num-1)
 		except Exception as e:
-			LOG.error('爬取{url}页面失败 error:{error} '.format(url=url,error=e.message))
-			if try_num>0:
-				self.scraping(url,try_num=try_num-1)
-		LOG.info('爬取{url}页面完毕 状态码{status_code}'.format(url=url,status_code=res.status_code))
+			LOG.error('爬取{url}页面失败 error:{error} '.format(url=url, error=e.message))
+			if try_num > 0:
+				self.scraping(url, try_num=try_num-1)
+		LOG.info('爬取{url}页面完毕 状态码{status_code}'.format(url=url, status_code=res.status_code))
 		if ext_param == object:
 			return res
 		else:
 			return res,ext_param
 
-
 	def get_all_rooms(self):
-		milli_time_stamp=str(int(time.time()*1000))
-		first_page_url=Config.page_url.format(page=1,milli_time_stamp=milli_time_stamp)
-		while 1 :
-			flag=1
-			first_page_content=self.scraping(first_page_url)
-			if first_page_content or flag>5:
+		milli_time_stamp = str(int(time.time()*1000))
+		first_page_url = Config.page_url.format(page=1, milli_time_stamp=milli_time_stamp)
+		while 1:
+			flag = 1
+			first_page_content = self.scraping(first_page_url)
+			if first_page_content or flag > 5:
 				break
-			flag+=1
+			flag += 1
 		try:
 			if first_page_content:
-				total_page=first_page_content.json()['data']['total']/120+1
-				self.total_room=first_page_content.json()['data']['total']
-				self.total_page=total_page
-			jobs = [gevent.spawn(self.scraping, Config.page_url.format(page=i + 1,milli_time_stamp=str(int(time.time()*1000)))) for i in xrange(int(total_page))]
+				total_page = first_page_content.json()['data']['total']/120+1
+				self.total_room = first_page_content.json()['data']['total']
+				self.total_page = total_page
+			jobs = [gevent.spawn(self.scraping, Config.page_url.format(page=i + 1, milli_time_stamp=str(int(time.time()*1000)))) for i in xrange(int(total_page))]
 			gevent.joinall(jobs)
 			for job in jobs:
 				if job.value:
@@ -84,7 +83,7 @@ class PandaLottery(BaseLottery):
 		lottery_rooms = []
 		try:
 			for content in self.get_all_rooms():
-				rooms=content.get('data').get('items')
+				rooms = content.get('data').get('items')
 				if rooms:
 					for room in rooms:
 						rollinfo = room.get('rollinfo') if isinstance(room.get('rollinfo'), list) else None
@@ -102,9 +101,9 @@ class PandaLottery(BaseLottery):
 		jobs=[]
 		try:
 			for roomid in lottery_rooms:
-				scraping= functools.partial(self.scraping, ext_param=roomid[1])
-				url=Config.lottery_url.format(rid=str(roomid[0]), milli_time_stamp=str(int(time.time() * 1000)))
-				i=gevent.spawn(scraping, url)
+				scraping = functools.partial(self.scraping, ext_param=roomid[1])
+				url = Config.lottery_url.format(rid=str(roomid[0]), milli_time_stamp=str(int(time.time() * 1000)))
+				i = gevent.spawn(scraping, url)
 				jobs.append(i)
 			gevent.joinall(jobs)
 			for job in jobs:
@@ -120,9 +119,9 @@ class PandaLottery(BaseLottery):
 
 	def get_lotteryInfo(self):
 		for content in self.scapy_lottery_room():
-			lottery_content=content[0].json()
-			self.roomid=content[1]
-			if lottery_content['data']!=[] and lottery_content["errno"] == 0:
+			lottery_content = content[0].json()
+			self.roomid = content[1]
+			if lottery_content['data'] != [] and lottery_content["errno"] == 0:
 				for data in lottery_content['data']:
 					needgift_num=data['giftnum']
 					need_giftid=data["need_giftid"]
@@ -146,7 +145,6 @@ class PandaLottery(BaseLottery):
 				total_room=self.total_room,fail_lottery_room=self.fail_lottery_room, times=str(time.time() - self.start_time)))
 
 
-
 if __name__ == '__main__':
-	p=PandaLottery()
+	p = PandaLottery()
 	p.run()

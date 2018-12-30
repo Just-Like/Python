@@ -20,16 +20,16 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 class DouyuLottery(BaseLottery):
 	def __init__(self):
 		BaseLottery.__init__(self,Config,LOG)
 		self.start_time=time.time()
 
-
 	def get_all_rooms(self):
 		index_res=self.scrapy(Config.index_url)
 		if index_res:
-			self.total_page=re.search(r'count:\s"(.*?)",',index_res.content).groups(0)[0]   #获取总的页数
+			self.total_page=re.search(r'count:\s"(.*?)",', index_res.content).groups(0)[0]   #获取总的页数
 		else:
 			self.total_lottery_room=0
 			LOG.error('获取总页数有误！！！')
@@ -42,34 +42,34 @@ class DouyuLottery(BaseLottery):
 				self.fail_page += 1
 
 	def get_lottery_rooms(self):
-		lottery_rooms=[]
+		lottery_rooms = []
 		for content in self.get_all_rooms():
 			try:
-				if content['msg']=='success':
-					datas=content['data']
+				if content['msg'] == 'success':
+					datas = content['data']
 					for room in datas['rl']:
 						if room.get("icdata") is not None and room["icdata"].has_key("302"):
 							lottery_rooms.append(room)
 				else:
-					self.fail_page+=1
+					self.fail_page += 1
 			except Exception,e:
-				self.fail_page+=1
-				LOG.error('page_url 的内容有误 value:{content},msg:{msg}'.format(content=content,msg=e.message))
+				self.fail_page += 1
+				LOG.error('page_url 的内容有误 value:{content},msg:{msg}'.format(content=content, msg=e.message))
 		self.total_lottery_room=len(lottery_rooms)
 		return lottery_rooms
 
 	def scapy_lottery_room(self):
-		lottery_rooms=self.get_lottery_rooms()
+		lottery_rooms = self.get_lottery_rooms()
 		jobs = [gevent.spawn(self.scrapy, Config.lottery_url.format(roomid=roomid['rid'])) for roomid in lottery_rooms]
 		gevent.joinall(jobs)
 		for job in jobs:
 			if job.value:
 				if not job.value.content:
-					self.fail_lottery_room+=1
+					self.fail_lottery_room += 1
 				else:
 					yield job.value
 			else:
-				self.fail_lottery_room+=1
+				self.fail_lottery_room += 1
 
 	def get_lotteryInfo(self):
 		prize_num = 0
@@ -112,7 +112,7 @@ class DouyuLottery(BaseLottery):
 
 if __name__ == '__main__':
 	while True:
-		t=DouyuLottery()
+		t = DouyuLottery()
 		start_time=time.time()
 		t.get_lotteryInfo()
 		t.update_lottery()

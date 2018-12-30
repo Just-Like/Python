@@ -22,11 +22,13 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 class EgameLottery(BaseLottery):
     def __init__(self):
         BaseLottery.__init__(self,Config,LOG)
         self.start_time=time.time()
         self.lottery_rooms=[]
+
     def get_category_list(self):
         url = Config.gamelist_url
         response = self.scrapy(url=url)
@@ -42,6 +44,7 @@ class EgameLottery(BaseLottery):
                 return all_app_id
             except Exception,e:
                 LOG.error('获取房间分类失败！！！ msg:{msg}'.format(msg=e.message))
+
     def scrapy_single_category(self,appid):
         pageid=1
         LOG.info('开始爬取分类--{appid}'.format(appid=appid))
@@ -65,7 +68,6 @@ class EgameLottery(BaseLottery):
                     self.fail_page += 1
         except Exception,e:
             LOG.error('爬取页面失败,msg:{}'.format(e.message))
-
 
     def get_all_lottery_room(self):
         all_app_id=self.get_category_list()

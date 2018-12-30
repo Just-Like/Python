@@ -16,10 +16,10 @@ from egame.egame_lottery import EgameLottery
 from panda.panda_config import PDConfig
 from panda.panda_lottery import PandaLottery
 
-which_spider={
-	'douyu':[DYConfig,DouyuLottery],
-	'egame':[EGConfig,EgameLottery],
-	'panda':[PDConfig,PandaLottery]
+which_spider = {
+	'douyu': [DYConfig, DouyuLottery],
+	'egame': [EGConfig, EgameLottery],
+	'panda': [PDConfig, PandaLottery]
 }
 
 if __name__ == "__main__":
@@ -28,8 +28,8 @@ if __name__ == "__main__":
 		sys.exit()
 	spider_name = sys.argv[1]
 	while True:
-		crawl_frequency=which_spider[spider_name][0].crawl_frequency
-		lottery_class=which_spider[spider_name][1]
+		crawl_frequency = which_spider[spider_name][0].crawl_frequency
+		lottery_class = which_spider[spider_name][1]
 		start_Time = time.time()
 		spider = lottery_class()
 		spider.run()

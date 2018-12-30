@@ -12,13 +12,12 @@ from sqlalchemy import create_engine,event
 from sqlalchemy.exc import DisconnectionError
 from config import CurrentConfig as Config
 
-engine = create_engine(Config.DB_CONNECT_STRING.format( user=Config.mysql_user,
+engine = create_engine(Config.DB_CONNECT_STRING.format(user=Config.mysql_user,
 														password=Config.mysql_password,
 														hostname=Config.mysql_hostname,
 														database=Config.mysql_database,
 														charset=Config.mysql_charset ), echo=Config.mysql_echo,pool_size=100)
 DB_Session = sessionmaker(bind=engine)
-
 
 
 def init_db():
@@ -27,6 +26,7 @@ def init_db():
 
 def drop_db():
 	Base.metadata.drop_all(engine)
+
 
 def checkout_listener(dbapi_con, con_record, con_proxy):
 	try:
@@ -39,6 +39,8 @@ def checkout_listener(dbapi_con, con_record, con_proxy):
 			raise DisconnectionError()
 		else:
 			raise
+
+
 event.listen(engine, 'checkout', checkout_listener)
 
 
